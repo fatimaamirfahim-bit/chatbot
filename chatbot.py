@@ -31,3 +31,31 @@ def greet(sentence):
         if word.lower() in GREET_INPUTS :
             return random.choice(GREET_RESPONSES)
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+#TfidfVectorizer converts text into numbers that represent how important each word is
+
+#Function that takes the user's input as a parameter
+def response(user_response):
+    robo1_respone = '' #Empty string to store the chatbot's response
+    #clean and lemmatize words and ignore stop words
+    TfidfVec = TfidfVectorizer(tokenizer = LemNormalize, stop_words = 'english')
+    #Converts ALL sentences in your chatbot.txt (stored in sent_tokens) into TF-IDF number vectors
+    tfidf = TfidfVec.fit_transform(sent_tokens)
+    #Compares the last sentence in sent_tokens (which is the user's input - added earlier in the code) to all sentences.
+    vals = cosine_similarity(tfidf[-1], tfidf)
+    #vals.argsort() = sorts similarity scores and returns their indices (positions)
+    #[0] = gets the first row
+    #[-2] = gets the second-to-last index
+    idx = vals.argsort()[0][-2]
+    flat = vals.flatten() #Converts the 2D array of similarity scores into a 1D array
+    flat.sort() #Sorts all similarity scores from lowest to highest
+    req_tfidf = flat[-2]
+    if (req_tfidf == 0):
+        robo1_respone = robo1_respone + "I am sorry! I don't understand you"
+        return robo1_respone
+    else:
+        robo1_respone = robo1_respone +sent_tokens[idx]
+        return robo1_respone
+    
+        
