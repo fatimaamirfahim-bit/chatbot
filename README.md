@@ -132,7 +132,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## Author
 
-**Your Name**
+Fatima Amir Fahim
 - GitHub: [@fatimaamirfahim-bit](https://github.com/fatimaamirfahim-bit)
 - Email: fahimfatimaamir@gmail.com
 
