@@ -1,8 +1,30 @@
-# Importing required libraries
+"""
+Simple Rule-Based Chatbot using NLTK and TF-IDF
+
+This chatbot responds to user queries by finding the most similar sentence
+from a knowledge base (chatbot.txt) using TF-IDF vectorization and cosine similarity.
+
+Dependencies:
+    - numpy
+    - nltk
+    - scikit-learn
+
+Author: Fatima Amir Fahim
+Date: February 2026
+"""
+
 import numpy as np #for numerical computation - extremely popular for Data Science
 import nltk #for Natural Language Processing
 import string #process and handle strings
 import random
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+#TfidfVectorizer converts text into numbers that represent how important each word is
+
+# ============================================
+# Load and Preprocess Knowledge Base
+# ============================================
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -14,31 +36,66 @@ nltk.download('wordnet') #Using the WordNet Dictionay
 sent_tokens = nltk.sent_tokenize(raw_doc) #Converts doc to list of sentences
 word_tokens = nltk.word_tokenize(raw_doc) #Converts doc to list of words
 
+# ============================================
+# Text Normalization Setup
+# ===========================================
+
 lemmer = nltk.stem.WordNetLemmatizer()
 #WordNet is a semantically-oriented dictionary of English included in NLTK
+
 def LemToken(tokens):
+    """Lemmatize a list of tokens to their root forms."""
     return [lemmer.lemmatize(token) for token in tokens]
+
+#Creates a translation dictionary that maps punctuation characters to None (which means "delete them)"
 remove_punct_dict = dict((ord(punct), None) for punct in string.punctuation) 
-# it's creating a translation dictionary that maps punctuation characters to None (which means "delete them")
+
 def LemNormalize(text):
+    """
+    Normalize text by removing punctuation, lowercasing, and lemmatizing.
+    
+    Args:
+        text (str): Input text to normalize
+        
+    Returns:
+        list: List of normalized tokens
+    """
     return LemToken(nltk.word_tokenize(text.lower().translate(remove_punct_dict)))
-    #translate() is a string method that uses the dictionary you created to transform the text, in this case, to remove punctuation.
+
+# ============================================
+# Greeting Configuration
+# ============================================
 
 GREET_INPUTS = ("hello", "hi", "greetings", "sup", "what's up", "hey",)
 GREET_RESPONSES = ["hi", "hey", "*nods*", "hi there", "hello", "I am glad! You are talking to me"]
 
 def greet(sentence):
-    
+    """Check if user input is a greeting and return appropriate response."""
     for word in sentence.split():
         if word.lower() in GREET_INPUTS :
             return random.choice(GREET_RESPONSES)
+    return None
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-#TfidfVectorizer converts text into numbers that represent how important each word is
+# ============================================
+# Response Generation
+# ============================================
 
-#Function that takes the user's input as a parameter
 def response(user_response):
+    """
+    Generate chatbot response using TF-IDF similarity matching.
+    
+    Process:
+        1. Add user input to sentence tokens
+        2. Vectorize all sentences using TF-IDF
+        3. Calculate cosine similarity
+        4. Return most similar sentence from knowledge base
+        
+    Args:
+        user_response (str): User's input message
+        
+    Returns:
+        str: Bot's response
+    """
     robo1_response = '' #Empty string to store the chatbot's response
     #clean and lemmatize words and ignore stop words
     TfidfVec = TfidfVectorizer(tokenizer = LemNormalize, stop_words = 'english')
@@ -53,6 +110,7 @@ def response(user_response):
     flat = vals.flatten() #Converts the 2D array of similarity scores into a 1D array
     flat.sort() #Sorts all similarity scores from lowest to highest
     req_tfidf = flat[-2]
+    
     if (req_tfidf == 0):
         robo1_response = robo1_response + "I am sorry! I don't understand you"
         return robo1_response
@@ -61,6 +119,10 @@ def response(user_response):
         
     sent_tokens.remove(user_response)
     return robo1_response
+
+# ============================================
+# Main Conversation Loop
+# ============================================
     
 flag = True
 print("BOT: My name is Fami. Let's have a conversation! Also, if you want to exit any time, just type Bye!")
