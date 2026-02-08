@@ -21,3 +21,13 @@ remove_punct_dict = dict((ord(punct), None) for punct in string.punctuation)
 def LemNormalize(text):
     return LemToken(nltk.word_tokenize(text.lower.translate(remove_punct_dict)))
     #translate() is a string method that uses the dictionary you created to transform the text, in this case, to remove punctuation.
+
+GREET_INPUTS = ("hello", "hi", "greetings", "sup", "what's up", "hey",)
+GREET_RESPONSES = ["hi", "hey", "*nods*", "hi there", "hello", "I am glad! You are talking to me"]
+
+def greet(sentence):
+    
+    for word in sentence.split():
+        if word.lower() in GREET_INPUTS :
+            return random.choice(GREET_RESPONSES)
+
